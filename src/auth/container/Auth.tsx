@@ -36,9 +36,10 @@ export default class Auth extends Component<{}, State> {
   authCAS = () => {
     login(this.state.cip, this.state.password).then(res => {
         if (res) {
-          // persist cip and password
+          // Todo persist cip and password
+          // Todo navigate to home
         } else {
-          // enter valid cip and password
+          // Todo enter valid cip and password
         }
       });
   };
