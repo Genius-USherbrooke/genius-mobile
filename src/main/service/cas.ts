@@ -1,6 +1,6 @@
-global.Buffer = global.Buffer || require('buffer').Buffer
+global.Buffer = global.Buffer || require('buffer').Buffer;
 
-export async function login(cip: string, password: string) {
+export async function login(cip: string, password: string): Promise<boolean> {
   const cheerio = require('cheerio');
   let lt, execution;
 
@@ -35,6 +35,7 @@ export async function login(cip: string, password: string) {
           return true;
         }
       });
-      return false;
-    })
+    });
+
+  return false;
 }

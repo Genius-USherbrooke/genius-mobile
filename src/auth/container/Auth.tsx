@@ -35,11 +35,11 @@ export default class Auth extends Component<{}, State> {
 
   authCAS = () => {
     login(this.state.cip, this.state.password).then(res => {
-        // if (res) {
-        //   // persist cip and password
-        // } else {
-        //   // enter valid cip and password
-        // }
+        if (res) {
+          // persist cip and password
+        } else {
+          // enter valid cip and password
+        }
       });
   };
 
