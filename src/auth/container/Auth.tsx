@@ -1,30 +1,27 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
-import { login } from '../../main/service/cas';
+import {isConnected, login} from '../../main/service/cas';
+import { NavigationInjectedProps, withNavigation } from "react-navigation";
+import {Credentials, save} from "../../main/persistence/credentials";
 
-interface State {
-  cip: string;
-  password: string;
-}
+class Auth extends Component<NavigationInjectedProps, Credentials> {
+  // static navigationOptions = {
+  //   headerTitle: (
+  //     <Image
+  //       style={{
+  //         alignSelf: 'center',
+  //         width: 250,
+  //         height: 80,
+  //         flex: 1,
+  //       }}
+  //       resizeMode="contain"
+  //       source={require('../../../assets/UdeS_signature.png')}
+  //     />
+  //   )
+  // };
 
-export default class Auth extends Component<{}, State> {
-  static navigationOptions = {
-    headerTitle: (
-      <Image
-        style={{
-          alignSelf: 'center',
-          width: 250,
-          height: 80,
-          flex: 1,
-        }}
-        resizeMode="contain"
-        source={require('../../../assets/UdeS_signature.png')}
-      />
-    )
-  };
-
-  constructor(props: {}) {
+  constructor(props: NavigationInjectedProps) {
     super(props);
 
     this.state = {
@@ -34,14 +31,17 @@ export default class Auth extends Component<{}, State> {
   }
 
   authCAS = () => {
-    login(this.state.cip, this.state.password).then(res => {
-        if (res) {
-          // Todo persist cip and password
-          // Todo navigate to home
-        } else {
-          // Todo enter valid cip and password
-        }
-      });
+    // login(this.state.cip, this.state.password).then(async res => {
+    //   console.log(res);
+    //   if (res) {
+    //       const success = await save(this.state);
+    //       // Todo check if save worked
+    //       this.props.navigation.navigate('TabNavigator');
+    //     } else {
+    //       // Todo enter valid cip and password
+    //     }
+    //   });
+    this.props.navigation.navigate('TabNavigator');
   };
 
   render() {
@@ -81,3 +81,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
   }
 });
+
+export default withNavigation(Auth);

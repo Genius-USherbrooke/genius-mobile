@@ -19,7 +19,7 @@ export default class ConversionTable {
     { minPercent: 75, maxPercent: 77, letter: "B+", value: 3.3, color: "#ccff33" },
     { minPercent: 78, maxPercent: 80, letter: "A-", value: 3.7, color: "#00cc00" },
     { minPercent: 81, maxPercent: 84, letter: "A", value: 4.0, color: "#00cc00" },
-    { minPercent: 85, maxPercent: 100, letter: "A+", value: 4.3, color: "#00cc00" }];
+    { minPercent: 85, maxPercent: 100, letter: "A+", value: 4.3, color: "#00BFFF" }];
 
   static getGrade(percent: number) {
     return this.grades.find(grade => grade.minPercent <= percent && grade.maxPercent >= percent);

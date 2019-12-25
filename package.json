@@ -9,8 +9,10 @@
   },
   "dependencies": {
     "buffer": "^5.4.3",
-    "cheerio": "^1.0.0-rc.3",
     "events": "^3.0.0",
+    "stream": "^0.0.2",
+    "util": "^0.12.1",
+    "cheerio": "^1.0.0-rc.3",
     "expo": "~36.0.0",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
@@ -23,8 +25,7 @@
     "react-navigation": "^4.0.10",
     "react-navigation-material-bottom-tabs": "^2.1.5",
     "react-navigation-stack": "^1.10.3",
-    "stream": "0.0.2",
-    "util": "^0.12.1"
+    "expo-secure-store": "~8.0.0"
   },
   "devDependencies": {
     "@types/react": "~16.9.0",

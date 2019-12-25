@@ -3,6 +3,7 @@ global.Buffer = global.Buffer || require('buffer').Buffer;
 export async function login(cip: string, password: string): Promise<boolean> {
   const cheerio = require('cheerio');
   let lt, execution;
+  let success = false;
 
   await fetch("https://cas.usherbrooke.ca/login", {
       "credentials": "include",
@@ -15,6 +16,7 @@ export async function login(cip: string, password: string): Promise<boolean> {
       lt = $('[name=lt]').val();
       execution = $('[name=execution]').val();
     });
+  // Todo catch error if already signed
 
   // console.log(lt, execution);
 
@@ -32,10 +34,32 @@ export async function login(cip: string, password: string): Promise<boolean> {
       const $ = cheerio.load(res);
       $('h2').map((_, h) => {
         if($(h).text() === "Connexion réussie") {
-          return true;
+          success = true;
         }
       });
     });
 
-  return false;
+  return success;
+}
+
+export async function isConnected(): Promise<boolean> {
+  const cheerio = require('cheerio');
+  let success = false;
+
+  await fetch("https://cas.usherbrooke.ca/login", {
+    "credentials": "include",
+    "method": "GET",
+    "mode": "cors"
+  })
+    .then(res => res.text())
+    .then(res => {
+      const $ = cheerio.load(res);
+      $('h2').map((_, h) => {
+        if($(h).text() === "Connexion réussie") {
+          success = true;
+        }
+      });
+    });
+
+  return success;
 }

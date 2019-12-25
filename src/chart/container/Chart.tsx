@@ -15,7 +15,7 @@ export default class Chart extends Component {
           </DataTable.Header>
 
           {ConversionTable.grades.slice(0).reverse().map(grade =>
-              <DataTable.Row style={{backgroundColor: grade.color}}>
+              <DataTable.Row style={{backgroundColor: grade.color}} key={grade.value}>
                 <DataTable.Cell>{grade.minPercent}% à {grade.maxPercent}%</DataTable.Cell>
                 <DataTable.Cell>{grade.letter}</DataTable.Cell>
                 <DataTable.Cell numeric>{grade.value}</DataTable.Cell>

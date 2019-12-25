@@ -1,33 +1,45 @@
 import React from 'react';
-import { createAppContainer } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 
 import Auth from '../../auth/container/Auth';
 import Home from '../../home/container/Home';
 import Chart from '../../chart/container/Chart';
+import { isConnected, login } from "../service/cas";
+import { get } from "../persistence/credentials";
+
+const BottomTabNavigator = createMaterialBottomTabNavigator({
+  Home: { screen: Home },
+  Chart: { screen: Chart },
+}, {
+  initialRouteName: 'Home',
+});
 
 // Todo if user persisted, default screen is home or else it is auth
-// const AppNavigator = createStackNavigator({
-//   Auth: {
-//     screen: Auth,
-//   },
-//   Home: {
-//     screen: Home,
-//   },
-//   Chart: {
-//     screen: Chart,
-//   },
-// });
+// async function initialRoute(): Promise<string> {
+//   let connected = await isConnected();
+//
+//   if (connected) {
+//     return 'TabNavigator';
+//   } else {
+//     const credentials = await get();
+//
+//     if (credentials !== null) {
+//       connected = await login(credentials.cip, credentials.password);
+//
+//       if (connected)
+//         return 'TabNavigator';
+//     }
+//   }
+//
+//   return 'Auth';
+// }
 
-const asd = createMaterialBottomTabNavigator(
-  {
-    Home: { screen: Home },
-    Chart: { screen: Chart },
-  },
-  {
-    initialRouteName: 'Home',
-  }
-);
+const AppNavigator = createSwitchNavigator({
+  Auth: { screen: Auth },
+  TabNavigator: { screen: BottomTabNavigator },
+}, {
+  initialRouteName: 'Auth',
+});
 
-export default createAppContainer(asd);
+export default createAppContainer(AppNavigator);
