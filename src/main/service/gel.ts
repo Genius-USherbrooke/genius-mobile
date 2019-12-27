@@ -45,6 +45,7 @@ export interface Grid {
   }[];
 }
 
+// score from completed exams
 export interface Competency {
   id: string;
   sub_competencies: {

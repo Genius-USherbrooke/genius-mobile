@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import { DataTable } from 'react-native-paper';
-import { grades, getGrade } from "../../main/utils/conversionTable";
+import { grades } from "../../main/utils/conversionTable";
 
 export default class Chart extends Component {
   render() {
