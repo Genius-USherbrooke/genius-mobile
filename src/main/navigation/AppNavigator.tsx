@@ -7,12 +7,20 @@ import Home from '../../home/container/Home';
 import Chart from '../../chart/container/Chart';
 import { isConnected, login } from "../service/cas";
 import { get } from "../persistence/credentials";
+import Competency from "../../home/container/Competency";
+
+const HomeStack = createSwitchNavigator({
+  Home: { screen: Home },
+  Competency: { screen: Competency }
+}, {
+  initialRouteName: 'Home'
+});
 
 const BottomTabNavigator = createMaterialBottomTabNavigator({
-  Home: { screen: Home },
+  HomeStack: { screen: HomeStack },
   Chart: { screen: Chart },
 }, {
-  initialRouteName: 'Home',
+  initialRouteName: 'HomeStack',
 });
 
 // Todo if user persisted, default screen is home or else it is auth

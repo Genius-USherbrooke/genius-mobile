@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { View, FlatList } from "react-native";
-import { Card, Title, Text } from 'react-native-paper';
+import {View, FlatList, StyleSheet, ScrollView, Dimensions} from "react-native";
+import { Card, Title, Text, ProgressBar } from 'react-native-paper';
 import { Competency, fetchCompetencies, fetchTrimesters, Trimester } from "../../main/service/gel";
 import { TabView, SceneMap } from 'react-native-tab-view';
 import {getGrade, Grade} from "../../main/utils/conversionTable";
+import {NavigationInjectedProps, withNavigation} from "react-navigation";
 
 interface State {
   navIndex: number;
@@ -11,7 +12,7 @@ interface State {
   competencies: Competency[];
 }
 
-export default class Home extends Component<{}, State> {
+class Home extends Component<NavigationInjectedProps, State> {
 
   constructor(props) {
     super(props);
@@ -35,9 +36,11 @@ export default class Home extends Component<{}, State> {
     fetchCompetencies(trimester, profil).then(competencies => this.setState({ competencies }));
   };
 
+  navigateCompetency = (competency: Competency) => this.props.navigation.navigate('Competency', {'competency': competency});
+
   render() {
-    return (
-      <View>
+    return(
+      <View >
         {/*<TabView*/}
         {/*  onIndexChange={this.setIndex}*/}
         {/*  navigationState={{ 0, }}*/}
@@ -54,16 +57,25 @@ export default class Home extends Component<{}, State> {
         <FlatList
           data={this.state.competencies}
           numColumns={2}
+          columnWrapperStyle={{justifyContent:'space-between'}}
           renderItem={({item}) => {
-            const percentCompleted = Math.round((item.score / item.total) * 100);
-            console.log(percentCompleted);
-            const grade: Grade = getGrade(percentCompleted);
+            const relativePercent = item.score / item.completedTotal;
+            const grade: Grade = getGrade(relativePercent);
+
+            const percentCompleted = item.completedTotal / item.total;
 
             return(
-              <Card style={{ backgroundColor: grade.color }}>
-                <Card.Title title={item.id}/>
+              <Card
+                style={{ borderWidth: 3, borderColor: grade.color, ...styles.competency }}
+                onPress={() => this.navigateCompetency(item)}
+              >
+                <Card.Title
+                  title={item.id}
+                  subtitle={`${Math.round(relativePercent * 100)}%`}
+                />
+                <Text style={styles.grade}>{grade.letter}</Text>
                 <Card.Content>
-                 <Text>{grade.value}</Text>
+                  <ProgressBar progress={percentCompleted}/>
                 </Card.Content>
               </Card>
             )}
@@ -73,3 +85,21 @@ export default class Home extends Component<{}, State> {
     )
   }
 }
+
+const screenWidth = Dimensions.get('window').width;
+
+const styles = StyleSheet.create({
+  competency: {
+    flex: 0.5,
+    margin: 5,
+  },
+  grade: {
+    position: 'absolute',
+    alignSelf: 'flex-end',
+    fontSize: 28,
+    marginTop: 10,
+    paddingRight: 10,
+  }
+});
+
+export default withNavigation(Home);

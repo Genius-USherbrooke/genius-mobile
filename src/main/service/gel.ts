@@ -22,24 +22,24 @@ export interface Trimester {
 export interface Grid {
   evaluations: {
     id: string;
-    score: number;
+    score: number | null;
     total: number;
     unit: string;
     title: string;
     order: number;
     competences: {
       id: string;
-      score: number;
+      score: number | null;
       total: number;
     }[];
   }[];
   aps: {
     id: string;
-    score: number;
+    score: number | null;
     total: number;
     competences: {
       id: string;
-      score: number;
+      score: number | null;
       total: number;
     }[];
   }[];
@@ -55,26 +55,54 @@ export interface Competency {
       label: string;
       score: number;
       total: number;
+      completed: boolean;
     }[];
     score: number;
     total: number;
+    completedTotal: number;
   }[];
   score: number;
   total: number;
+  completedTotal: number;
 }
 
 function convertGridToCompetencies(grid: Grid): Competency[] {
-  return grid.aps.map(ap => ({
+  let competencies: Competency[] = grid.aps.map(ap => ({
     id: ap.id,
     sub_competencies: ap.competences.map(competency => ({
       id: competency.id,
       evaluations: [],
       score: competency.score,
       total: competency.total,
+      completedTotal: 0
     })),
     score: ap.competences.reduce((a, b) => a + (b['score'] || 0), 0),
     total: ap.competences.reduce((a, b) => a + (b['total'] || 0), 0),
+    completedTotal: 0
   }));
+
+  grid.evaluations.forEach(evaluation =>
+    evaluation.competences.forEach(competence => {
+      const compId = competence.id.substring(0, competence.id.indexOf('-'));
+      const subCompId = competence.id.substring(competence.id.indexOf('-') + 1, competence.id.length);
+
+      // Todo check for undefined
+      const comp = competencies.find(competency => competency.id === compId);
+      const subComp = comp.sub_competencies.find(subCompetency => subCompetency.id === subCompId);
+
+      // Todo score 0 if null
+      subComp.evaluations.push({
+        score: competence.score,
+        total: competence.total,
+        app: evaluation.unit,
+        label: evaluation.title,
+        completed: competence.score != null,
+      });
+
+      subComp.completedTotal = subComp.evaluations.reduce((a, b) => a + (b['completed'] ? b['total'] : 0), 0);
+      comp.completedTotal = comp.sub_competencies.reduce((a, b) => a + b['completedTotal'], 0);
+    }));
+  return competencies;
 }
 
 export async function fetchSession(): Promise<Session> {

@@ -21,5 +21,6 @@ export const grades: Grade[] =  [
   { minPercent: 85, maxPercent: 100, letter: "A+", value: 4.3, color: "#00BFFF" }];
 
 export function getGrade(percent: number) {
+  percent = Math.round(percent * 100);
   return grades.find(grade => grade.minPercent <= percent && grade.maxPercent >= percent);
 }

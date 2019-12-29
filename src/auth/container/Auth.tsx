@@ -34,13 +34,13 @@ class Auth extends Component<NavigationInjectedProps, Credentials> {
     // login(this.state.cip, this.state.password).then(async res => {
     //   console.log(res);
     //   if (res) {
-    //       const success = await save(this.state);
-    //       // Todo check if save worked
-    //       this.props.navigation.navigate('TabNavigator');
-    //     } else {
-    //       // Todo enter valid cip and password
-    //     }
-    //   });
+    //     const success = await save(this.state);
+    //     // Todo check if save worked
+    //     this.props.navigation.navigate('TabNavigator');
+    //   } else {
+    //     // Todo enter valid cip and password
+    //   }
+    // });
     this.props.navigation.navigate('TabNavigator');
   };
 
