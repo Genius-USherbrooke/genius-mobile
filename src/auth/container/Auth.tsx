@@ -1,25 +1,15 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
-import {isConnected, login} from '../../main/service/cas';
 import { NavigationInjectedProps, withNavigation } from "react-navigation";
-import {Credentials, save} from "../../main/persistence/credentials";
+import {Credentials, get, save} from "../../main/persistence/credentials";
+import {isConnected, login} from "../../main/service/cas";
 
-class Auth extends Component<NavigationInjectedProps, Credentials> {
-  // static navigationOptions = {
-  //   headerTitle: (
-  //     <Image
-  //       style={{
-  //         alignSelf: 'center',
-  //         width: 250,
-  //         height: 80,
-  //         flex: 1,
-  //       }}
-  //       resizeMode="contain"
-  //       source={require('../../../assets/UdeS_signature.png')}
-  //     />
-  //   )
-  // };
+interface State extends Credentials {
+  check: boolean;
+}
+
+class Auth extends Component<NavigationInjectedProps, State> {
 
   constructor(props: NavigationInjectedProps) {
     super(props);
@@ -27,49 +17,78 @@ class Auth extends Component<NavigationInjectedProps, Credentials> {
     this.state = {
       cip: '',
       password: '',
-    }
+      check: false
+    };
+
+    this.checkCredentials();
   }
 
-  authCAS = () => {
-    // login(this.state.cip, this.state.password).then(async res => {
-    //   console.log(res);
-    //   if (res) {
-    //     const success = await save(this.state);
-    //     // Todo check if save worked
-    //     this.props.navigation.navigate('TabNavigator');
-    //   } else {
-    //     // Todo enter valid cip and password
-    //   }
-    // });
-    this.props.navigation.navigate('TabNavigator');
+  navigateToHome = () => this.props.navigation.navigate('TabNavigator');
+
+  authCAS = async () => {
+    const connected = await login(this.state.cip, this.state.password);
+
+    if (connected) {
+      const success = await save(this.state);
+      if (!success)
+        console.log('save error');
+
+      this.navigateToHome()
+    }
+  };
+
+  checkCredentials = async () => {
+    let connected = await isConnected();
+
+    if (connected) {
+      this.navigateToHome();
+      return;
+    } else {
+      const credentials = await get();
+
+      if (credentials !== null) {
+        connected = await login(credentials.cip, credentials.password);
+
+        if (connected) {
+          this.navigateToHome();
+          return;
+        }
+      }
+    }
+
+    this.setState({ check: true })
   };
 
   render() {
-    return (
-      <View style={styles.container}>
-        <TextInput
-          label="cip"
-          mode="outlined"
-          value={this.state.cip}
-          onChangeText={cip => this.setState({ cip })}
-        />
-        <TextInput
-          label="password"
-          mode="outlined"
-          secureTextEntry
-          value={this.state.password}
-          onChangeText={password => this.setState({ password })}
-        />
-        <Button
-          style={styles.btn}
-          mode="contained"
-          dark
-          onPress={this.authCAS}
-        >
-          Login
-        </Button>
-      </View>
-    );
+    if (!this.state.check) {
+      return null
+    } else {
+      return (
+        <View style={styles.container}>
+          <TextInput
+            label="cip"
+            mode="outlined"
+            value={this.state.cip}
+            onChangeText={cip => this.setState({ cip })}
+          />
+          <TextInput
+            label="password"
+            mode="outlined"
+            secureTextEntry
+            value={this.state.password}
+            onChangeText={password => this.setState({ password })}
+          />
+          <Button
+            style={styles.btn}
+            mode="contained"
+            dark
+            onPress={this.authCAS}
+          >
+            Login
+          </Button>
+        </View>
+      );
+    }
   }
 }
 

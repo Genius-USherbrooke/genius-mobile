@@ -45,7 +45,6 @@ export interface Grid {
   }[];
 }
 
-// score from completed exams
 export interface Competency {
   id: string;
   sub_competencies: {
@@ -72,12 +71,12 @@ function convertGridToCompetencies(grid: Grid): Competency[] {
     sub_competencies: ap.competences.map(competency => ({
       id: competency.id,
       evaluations: [],
-      score: competency.score,
+      score: competency.score || 0,
       total: competency.total,
       completedTotal: 0
     })),
     score: ap.competences.reduce((a, b) => a + (b['score'] || 0), 0),
-    total: ap.competences.reduce((a, b) => a + (b['total'] || 0), 0),
+    total: ap.competences.reduce((a, b) => a + b['total'], 0),
     completedTotal: 0
   }));
 
@@ -90,9 +89,8 @@ function convertGridToCompetencies(grid: Grid): Competency[] {
       const comp = competencies.find(competency => competency.id === compId);
       const subComp = comp.sub_competencies.find(subCompetency => subCompetency.id === subCompId);
 
-      // Todo score 0 if null
       subComp.evaluations.push({
-        score: competence.score,
+        score: competence.score || 0,
         total: competence.total,
         app: evaluation.unit,
         label: evaluation.title,

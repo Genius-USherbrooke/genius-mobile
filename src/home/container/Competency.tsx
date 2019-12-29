@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { View, FlatList, StyleSheet, ScrollView } from "react-native";
-import {NavigationInjectedProps, withNavigation} from "react-navigation";
-import {DataTable, Text, Appbar } from 'react-native-paper';
-import {Competency} from "../../main/service/gel";
-import {getGrade, grades} from "../../main/utils/conversionTable";
+import { View, FlatList } from "react-native";
+import { NavigationActions, NavigationInjectedProps, withNavigation } from "react-navigation";
+import { DataTable, Text, Appbar } from 'react-native-paper';
+import { Competency } from "../../main/service/gel";
+import { getGrade } from "../../main/utils/conversionTable";
 
 interface NavProps {
   competency: Competency
@@ -19,9 +19,9 @@ class _Competency extends Component<NavigationInjectedProps<NavProps>> {
     const competency = this.props.navigation.state.params.competency;
 
     return (
-      <View>
+      <View style={{flex:1}}>
         <Appbar.Header>
-          <Appbar.BackAction onPress={() => this.props.navigation.goBack()}/>
+          <Appbar.BackAction onPress={() => this.props.navigation.navigate('Home')}/>
           <Appbar.Content
             title={competency.id}
           />
@@ -48,20 +48,20 @@ class _Competency extends Component<NavigationInjectedProps<NavProps>> {
                     const grade = getGrade(evaluation.score/evaluation.total);
 
                     return(
-                      <DataTable.Row style={{backgroundColor: grade.color}} key={grade.value}>
+                      <DataTable.Row key={evaluation.label}>
                         <DataTable.Cell>{evaluation.app}</DataTable.Cell>
                         <DataTable.Cell>{evaluation.label}</DataTable.Cell>
-                        <DataTable.Cell numeric>{evaluation.score}</DataTable.Cell>
+                        <DataTable.Cell style={{borderBottomWidth: 3, borderBottomColor: grade.color}} numeric>{evaluation.score}</DataTable.Cell>
                         <DataTable.Cell numeric>{evaluation.total}</DataTable.Cell>
                       </DataTable.Row>
                     )
                   }
                 )}
 
-                <DataTable.Row key="total">
+                <DataTable.Row style={{borderTopWidth: 1, borderTopColor: 'black'}} key="total">
                   <DataTable.Cell>Total</DataTable.Cell>
                   <DataTable.Cell>Total</DataTable.Cell>
-                  <DataTable.Cell numeric>{item.score}</DataTable.Cell>
+                  <DataTable.Cell style={{borderBottomWidth: 3, borderBottomColor: item.completedTotal ? getGrade(item.score/item.completedTotal).color : 'black' }} numeric>{item.score}</DataTable.Cell>
                   <DataTable.Cell numeric>{item.total}</DataTable.Cell>
                 </DataTable.Row>
               </DataTable>
@@ -72,7 +72,5 @@ class _Competency extends Component<NavigationInjectedProps<NavProps>> {
     )
   }
 }
-
-const styles = StyleSheet.create({ });
 
 export default withNavigation(_Competency);
