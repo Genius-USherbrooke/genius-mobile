@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {View, FlatList, StyleSheet, Dimensions} from "react-native";
-import { Card, Text, ProgressBar } from 'react-native-paper';
-import {Competency, fetchCompetencies, fetchSession, fetchTrimesters, Session, Trimester} from "../../main/service/gel";
+import { View, FlatList, StyleSheet, Dimensions } from "react-native";
+import { Card, Text, ProgressBar, Divider, Button, Menu } from 'react-native-paper';
+import { Competency, fetchCompetencies, fetchSession, fetchTrimesters, Session, Trimester } from "../../main/service/gel";
 import { getGrade, Grade } from "../../main/utils/conversionTable";
 import { NavigationInjectedProps, withNavigation } from "react-navigation";
 
@@ -9,9 +9,14 @@ interface State {
   session: Session;
   trimesters: Trimester[];
   competencies: Competency[];
+  selectedTrimester: string;
+  menuVisible: boolean;
 }
 
 class Home extends Component<NavigationInjectedProps, State> {
+  static navigationOptions = {
+    header: null,
+  };
 
   constructor(props) {
     super(props);
@@ -25,35 +30,63 @@ class Home extends Component<NavigationInjectedProps, State> {
         }
       },
       trimesters: [],
-      competencies: []
+      competencies: [],
+      selectedTrimester: '',
+      menuVisible: false,
     };
 
-    this.fetchSession()
+    this.fetchSession();
     this.fetchTrimesters();
   }
 
   fetchSession = () => fetchSession().then(session => this.setState({ session }));
 
-  fetchTrimesters = () => fetchTrimesters().then(trimesters => this.setState({ trimesters }));
+  fetchTrimesters = () => fetchTrimesters().then(trimesters => {
+    this.setState({
+      trimesters,
+      selectedTrimester: trimesters.find(trimester => trimester.current).id
+    });
+
+    const currentTrimester = trimesters.find(trimester => trimester.current);
+    this.fetchCompetencies(currentTrimester.id, currentTrimester.profiles[0].id);
+  });
 
   fetchCompetencies = (trimester: string, profil: string) => {
-    fetchCompetencies(trimester, profil).then(competencies => this.setState({ competencies }));
+    fetchCompetencies(trimester, profil).then(competencies => this.setState({ competencies, selectedTrimester: trimester }));
   };
 
   navigateCompetency = (competency: Competency) => this.props.navigation.navigate('Competency', {'competency': competency});
+
+  toggleMenu = () => this.setState({ menuVisible: !this.state.menuVisible });
+
+  selectTrimester = (id: string, profil: string) => {
+    this.fetchCompetencies(id, profil);
+    this.toggleMenu();
+  };
 
   render() {
     return(
       <View style={styles.container}>
         <Text>Name: {this.state.session.user.fullName}</Text>
         <Text>Cip: {this.state.session.user.cip}</Text>
-
-        <FlatList
-          data={this.state.trimesters}
-          renderItem={({item}) =>
-            <Text onPress={() => this.fetchCompetencies(item.id, item.profiles[0].id)}>{item.id}</Text>
+        <Divider/>
+        <Menu
+          visible={this.state.menuVisible}
+          onDismiss={this.toggleMenu}
+          anchor={
+            <Button
+              style={styles.trimesterBtn}
+              mode="contained"
+              onPress={this.toggleMenu}
+            >
+              {this.state.selectedTrimester}
+            </Button>
           }
-        />
+        >
+          {this.state.trimesters.map(trimester =>
+            <Menu.Item onPress={() => this.selectTrimester(trimester.id, trimester.profiles[0].id)} title={trimester.id} key={trimester.id}/>
+          )}
+        </Menu>
         <FlatList
           data={this.state.competencies}
           numColumns={2}
@@ -97,6 +130,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 20,
+  },
+  trimesterBtn: {
+    margin: 10,
   },
   column: {
     justifyContent:'space-between'

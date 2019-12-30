@@ -6,8 +6,9 @@ import Auth from '../../auth/container/Auth';
 import Home from '../../home/container/Home';
 import Chart from '../../chart/container/Chart';
 import Competency from "../../home/container/Competency";
+import {createStackNavigator} from "react-navigation-stack";
 
-const HomeStack = createSwitchNavigator({
+const HomeStack = createStackNavigator({
   Home: { screen: Home },
   Competency: { screen: Competency }
 }, {

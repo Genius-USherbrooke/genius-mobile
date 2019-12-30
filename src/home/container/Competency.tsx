@@ -10,6 +10,9 @@ interface NavProps {
 }
 
 class _Competency extends Component<NavigationInjectedProps<NavProps>> {
+  static navigationOptions = {
+    header: null,
+  };
 
   constructor(props) {
     super(props);
@@ -23,7 +26,7 @@ class _Competency extends Component<NavigationInjectedProps<NavProps>> {
     return (
       <View style={{flex:1}}>
         <Appbar.Header>
-          <Appbar.BackAction onPress={() => this.props.navigation.navigate('Home')}/>
+          <Appbar.BackAction onPress={() => this.props.navigation.goBack()}/>
           <Appbar.Content
             title={competency.id}
           />
