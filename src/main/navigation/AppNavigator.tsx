@@ -1,12 +1,14 @@
 import React from 'react';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
+import {createStackNavigator} from "react-navigation-stack";
 
 import Auth from '../../auth/container/Auth';
 import Home from '../../home/container/Home';
 import Chart from '../../chart/container/Chart';
 import Competency from "../../home/container/Competency";
-import {createStackNavigator} from "react-navigation-stack";
+import Horarius from "../../horarius/container/Horarius";
+
 
 const HomeStack = createStackNavigator({
   Home: { screen: Home },
@@ -18,6 +20,7 @@ const HomeStack = createStackNavigator({
 const BottomTabNavigator = createMaterialBottomTabNavigator({
   HomeStack: { screen: HomeStack },
   Chart: { screen: Chart },
+  Horarius: { screen: Horarius },
 }, {
   initialRouteName: 'HomeStack',
 });

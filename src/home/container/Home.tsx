@@ -64,7 +64,23 @@ class Home extends Component<NavigationInjectedProps, State> {
     this.toggleMenu();
   };
 
+  calculateApproxAbsoluteGpa = (competencies: Competency[]) => {
+    const approxGrade = competencies.reduce((a, b) => a + getGrade(b['score']/b['total']).value, 0);
+
+    return approxGrade / competencies.length;
+  };
+
+  calculateApproxAverageGpa = (competencies: Competency[], approxCreds: number) => {
+    const approxGrade = competencies.reduce((a, b) => a + (b['completedTotal'] ? getGrade(b['score']/b['completedTotal']).value : 0), 0);
+
+    return approxGrade / approxCreds;
+  };
+
+  average = (score: number) => Math.round(score * 100) / 100;
+
   render() {
+    const approxCreds = this.state.competencies.reduce((a, b) => a + (b['completedTotal'] ? 1 : 0), 0);
+
     return(
       <View style={styles.container}>
         <Text>Name: {this.state.session.user.fullName}</Text>
@@ -87,6 +103,10 @@ class Home extends Component<NavigationInjectedProps, State> {
             <Menu.Item onPress={() => this.selectTrimester(trimester.id, trimester.profiles[0].id)} title={trimester.id} key={trimester.id}/>
           )}
         </Menu>
+        <Divider/>
+        <Text>Approx GPA</Text>
+        <Text>Absolute: {this.average(this.calculateApproxAbsoluteGpa(this.state.competencies))}</Text>
+        <Text>Relative: {approxCreds ? this.average(this.calculateApproxAverageGpa(this.state.competencies, approxCreds)) : '-'}</Text>
         <FlatList
           data={this.state.competencies}
           numColumns={2}
