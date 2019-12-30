@@ -6,6 +6,6 @@ export default class Horarius extends Component {
     return <WebView
       source={{uri: 'https://www.gel.usherbrooke.ca/horarius/'}}
       style={{marginTop: 20}}
-    />;
+    />
   }
 }
