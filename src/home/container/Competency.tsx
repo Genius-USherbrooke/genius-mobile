@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, FlatList } from "react-native";
-import { NavigationActions, NavigationInjectedProps, withNavigation } from "react-navigation";
-import { DataTable, Text, Appbar } from 'react-native-paper';
+import { View, FlatList, StyleSheet } from "react-native";
+import { NavigationInjectedProps, withNavigation } from "react-navigation";
+import { DataTable, Text, Appbar, Divider, Title } from 'react-native-paper';
 import { Competency } from "../../main/service/gel";
 import { getGrade } from "../../main/utils/conversionTable";
 
@@ -15,6 +15,8 @@ class _Competency extends Component<NavigationInjectedProps<NavProps>> {
     super(props);
   }
 
+  average = (score: number) => Math.round(score * 100) / 100;
+
   render() {
     const competency = this.props.navigation.state.params.competency;
 
@@ -26,22 +28,24 @@ class _Competency extends Component<NavigationInjectedProps<NavProps>> {
             title={competency.id}
           />
         </Appbar.Header>
-        <Text>{competency.score}/{competency.total}</Text>
-        <Text>{Math.round((competency.score / competency.total) * 100)}%</Text>
+        <Text>Total: {this.average(competency.score)}/{competency.total}</Text>
+        <Text>Absolute: {Math.round((competency.score / competency.total) * 100)}%</Text>
+        <Text>Relative: {competency.completedTotal ? `${Math.round((competency.score / competency.completedTotal) * 100)}%` : '-'}</Text>
+        <Divider/>
         <FlatList
-          data={competency.sub_competencies}
+          data={competency.sub_competencies.sort((a, b) => Number(a.id) - Number(b.id))}
           renderItem={({item}) =>
             <View style={{flex: 1}}>
-              <Text>{item.id}</Text>
-              <Text>{item.score}/{item.total}</Text>
-              <Text>{Math.round((item.score / item.total) * 100)}%</Text>
+              <Title>{competency.id}-{item.id}</Title>
+              <Text>{this.average(item.score)}/{item.total}</Text>
+              <Text>Total {Math.round((item.score / item.total) * 100)}%</Text>
+              <Text>Relative: {item.completedTotal ? `${Math.round((item.score / item.completedTotal) * 100)}%` : '-'}</Text>
 
               <DataTable>
                 <DataTable.Header>
-                  <DataTable.Title>App</DataTable.Title>
-                  <DataTable.Title>Label</DataTable.Title>
-                  <DataTable.Title numeric>Score</DataTable.Title>
-                  <DataTable.Title numeric>Total</DataTable.Title>
+                  <DataTable.Title style={styles.labelCol}>Label</DataTable.Title>
+                  <DataTable.Title style={styles.numCol} numeric>Score</DataTable.Title>
+                  <DataTable.Title style={styles.numCol} numeric>Total</DataTable.Title>
                 </DataTable.Header>
 
                 {item.evaluations.map(evaluation => {
@@ -49,20 +53,18 @@ class _Competency extends Component<NavigationInjectedProps<NavProps>> {
 
                     return(
                       <DataTable.Row key={evaluation.label}>
-                        <DataTable.Cell>{evaluation.app}</DataTable.Cell>
-                        <DataTable.Cell>{evaluation.label}</DataTable.Cell>
-                        <DataTable.Cell style={{borderBottomWidth: 3, borderBottomColor: grade.color}} numeric>{evaluation.score}</DataTable.Cell>
-                        <DataTable.Cell numeric>{evaluation.total}</DataTable.Cell>
+                        <DataTable.Cell style={styles.labelCol}>{evaluation.label}</DataTable.Cell>
+                        <DataTable.Cell style={{borderBottomWidth: 3, borderBottomColor: evaluation.completed ? grade.color : 'transparent', ...styles.numCol}} numeric>{evaluation.completed ? evaluation.score : '-'}</DataTable.Cell>
+                        <DataTable.Cell style={styles.numCol} numeric>{evaluation.total}</DataTable.Cell>
                       </DataTable.Row>
                     )
                   }
                 )}
 
                 <DataTable.Row style={{borderTopWidth: 1, borderTopColor: 'black'}} key="total">
-                  <DataTable.Cell>Total</DataTable.Cell>
-                  <DataTable.Cell>Total</DataTable.Cell>
-                  <DataTable.Cell style={{borderBottomWidth: 3, borderBottomColor: item.completedTotal ? getGrade(item.score/item.completedTotal).color : 'black' }} numeric>{item.score}</DataTable.Cell>
-                  <DataTable.Cell numeric>{item.total}</DataTable.Cell>
+                  <DataTable.Cell style={styles.labelCol}>Total</DataTable.Cell>
+                  <DataTable.Cell style={{borderBottomWidth: 3, borderBottomColor: item.completedTotal ? getGrade(item.score/item.completedTotal).color : 'transparent', ...styles.numCol }} numeric>{item.completedTotal ? this.average(item.score) : '-'}</DataTable.Cell>
+                  <DataTable.Cell style={styles.numCol} numeric>{this.average(item.total)}</DataTable.Cell>
                 </DataTable.Row>
               </DataTable>
             </View>
@@ -72,5 +74,14 @@ class _Competency extends Component<NavigationInjectedProps<NavProps>> {
     )
   }
 }
+
+const styles = StyleSheet.create({
+  labelCol: {
+    flex: 3,
+  },
+  numCol: {
+    flex: 1,
+  },
+});
 
 export default withNavigation(_Competency);
